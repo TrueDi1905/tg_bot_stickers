@@ -1,6 +1,6 @@
 from aiogram.utils import executor
 
-import handlers, admin
+import handlers
 from bot_tg import dp
 
 handlers.handler_register_client(dp)

@@ -7,8 +7,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from bot_tg import dp
 from keyboard import start_menu_keyboard, back_to_menu_keyboard, photo_choice_keyboard, pack_keyboard
-from remove_bg import photo_remove_bg
-
+#from remove_bg import photo_remove_bg
+import logging
 
 class FSMAdmin(StatesGroup):
     photo = State()
@@ -28,6 +28,13 @@ async def create_stickers(message: types.Message):
     await message.answer('Зарузите фото', reply_markup=back_to_menu_keyboard)
 
 
+@dp.message_handler(content_types=['text'], text='Мои стикеры', state=None)
+async def my_stickers(message: types.Message):
+    s = customers.select()
+    print(s)
+    await message.answer('Зарузите фото', reply_markup=back_to_menu_keyboard)
+
+
 @dp.message_handler(content_types=['photo'], state=FSMAdmin.photo)
 async def load_photo(message: types.Message, state: FSMContext):
     image = io.BytesIO()
@@ -40,12 +47,12 @@ async def load_photo(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=FSMAdmin.photo_background)
-async def load_name(message: types.Message, state: FSMContext):
-    if message.text == 'Удалить фон':
-        #await photo_remove_bg(data['photo'])
-        print('удаляем фон')
+async def choice_background(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        data['photo_background'] = True
+        if message.text == 'Удалить фон':
+            data['photo_background'] = True
+        else:
+            data['photo_background'] = False
     await FSMAdmin.next()
     await message.reply('Выберите куда загрузить стикер', reply_markup=pack_keyboard)
 
