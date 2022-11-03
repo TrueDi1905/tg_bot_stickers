@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 
-TOKEN_BOT = '5528638691:AAEIxigYr9MHZSAuO7-sA5bnygIPwNWScsc'
+TOKEN_BOT = '5675240850:AAFZeadYrd--tK_SVQJEUgBriNSKwseUwoI'
 
 logging.basicConfig(level=logging.INFO)
 
