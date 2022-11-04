@@ -25,7 +25,4 @@ from models import engine, Users
 #    app.get_me()
 #except:
 #    print(1)
-app = Client("my_account")
-print(app.session)
-if app.session is not None:
-     print(123)
+#stickersbot.ddns.net
