@@ -1,3 +1,0 @@
-#!c:\dev\tg_bot_stickers\env\scripts\python.exe
-from numba.pycc import main
-main()
