@@ -1,8 +1,19 @@
+from dotenv import dotenv_values
 from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, BigInteger
 from sqlalchemy.orm import declarative_base
 
 
-engine = create_engine('postgresql+psycopg2://truedi1905:chelsea1905@db:5432/postgres_db')
+ENV = dotenv_values('../.env')
+DB_USER = ENV['DB_USER']
+DB_PASSWORD = ENV['DB_PASSWORD']
+DB_HOST = ENV['DB_HOST']
+DB_PORT = ENV['DB_PORT']
+DB_NAME = ENV['DB_NAME']
+
+
+engine = create_engine(f'postgresql+psycopg2://'
+                       f'{DB_USER}:{DB_PASSWORD}'
+                       f'@{DB_HOST}:{DB_PORT}/{DB_NAME}')
 
 Base = declarative_base()
 

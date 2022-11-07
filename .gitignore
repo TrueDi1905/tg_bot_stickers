@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 pgdata/
 my_account.session
+inserts.sql
