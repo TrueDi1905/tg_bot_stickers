@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, BigInteger
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import declarative_base
 
 
-engine = create_engine('postgresql+psycopg2://truedi1905:chelsea1905@localhost:5432/postgres_db')
+engine = create_engine('postgresql+psycopg2://truedi1905:chelsea1905@db:5432/postgres_db')
 
 Base = declarative_base()
 

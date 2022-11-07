@@ -4,3 +4,4 @@ Pyrogram==2.0.59
 psycopg2-binary==2.9.5
 Pillow==9.2.0
 rembg==2.0.25
+python-dotenv==0.21.0
