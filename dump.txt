@@ -1,2 +1,0 @@
-pg_dumpall: error: too many command-line arguments (first is "+%Y-%m-%d_%H_%M_%S).sq")
-pg_dumpall: hint: Try "pg_dumpall --help" for more information.
