@@ -1,5 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
+
 #Меню
 create_stickers_button = KeyboardButton(text='Создать новый стикер')
 my_stickers = KeyboardButton(text='Мои стикеры')
@@ -34,9 +35,11 @@ none_pack = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
 none_pack.add(new_pack_button, cancel_state_button)
 
 
-def pack_choice(get_user):
+#Мои стикеры
+async def pack_choice(get_stickers):
     pack_choice_keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    for i in get_user:
-        pack_choice_keyboard.add(KeyboardButton(text="".join(i)))
+    for pack in get_stickers:
+        pack_choice_keyboard.add(KeyboardButton(text="".join(pack)))
     pack_choice_keyboard.add(cancel_state_button)
     return pack_choice_keyboard
+

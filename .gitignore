@@ -128,5 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 pgdata/
-my_account.session
+bot/my_account.session
 inserts.sql

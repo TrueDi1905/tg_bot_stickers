@@ -1,7 +1,7 @@
 from aiogram.utils import executor
 
 import handlers
-from bot_tg import dp
+from config import dp
 
 handlers.handler_register_client(dp)
 

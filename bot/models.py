@@ -1,5 +1,6 @@
 from dotenv import dotenv_values
-from sqlalchemy import create_engine, Column, Integer, ForeignKey, String, BigInteger
+from sqlalchemy import create_engine, Column, Integer, \
+    ForeignKey, String, BigInteger
 from sqlalchemy.orm import declarative_base
 
 
