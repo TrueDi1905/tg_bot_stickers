@@ -141,7 +141,7 @@ async def stick_create(message: types.Message, state: FSMContext):
     text_create = '/addsticker' if state_pack['pack'] == 'old' else '/newpack'
     await app.send_message("@Stickers", text_create)
     await asyncio.sleep(1)
-    await app.send_message("@Stickers", f'{message.text} @Stickers_Now_Bot')
+    await app.send_message("@Stickers", f'{message.text}')
     await asyncio.sleep(1)
     await app.send_document("@Stickers", state_pack['photo'])
     await asyncio.sleep(1)

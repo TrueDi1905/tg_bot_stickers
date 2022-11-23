@@ -13,8 +13,8 @@ services:
     ports:
       - "5432:5432"
 
-  web:
-    build: .
-    restart: always
-    depends_on:
-      - db
+  #web:
+   # build: .
+    #restart: always
+    #depends_on:
+     # - db
