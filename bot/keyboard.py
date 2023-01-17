@@ -2,10 +2,9 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 
 #Меню
-create_stickers_button = KeyboardButton(text='Создать новый стикер')
 my_stickers = KeyboardButton(text='Мои стикеры')
 start_menu_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-start_menu_keyboard.add(create_stickers_button, my_stickers)
+start_menu_keyboard.add(my_stickers)
 
 
 #Выход из FSM

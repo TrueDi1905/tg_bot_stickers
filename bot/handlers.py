@@ -34,7 +34,7 @@ app.start()
 
 
 async def send_welcome(message: types.Message):
-    text = 'Желаешь создать новый стикер?'
+    text = 'Загрузи сюда фото, что бы создать стикер 👇'
     await message.answer(text, reply_markup=start_menu_keyboard)
 
 
@@ -48,14 +48,6 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await send_welcome(message)
 
 
-@dp.message_handler(content_types=['text'],
-                    text='Создать новый стикер', state=None)
-async def create_stickers(message: types.Message):
-    await FSMAdmin.photo.set()
-    text = 'Зарузите фото'
-    await message.answer(text, reply_markup=back_to_menu_keyboard)
-
-
 @dp.message_handler(content_types=['text'], text='Мои стикеры', state=None)
 async def my_stickers(message: types.Message):
     get_stickers = engine.execute(
@@ -63,15 +55,19 @@ async def my_stickers(message: types.Message):
                                              message.from_user.id)).fetchall()
     packs = await pack_choice(get_stickers)
     url = 'https://t.me/addstickers/'
-    await message.answer('Ваши стикерпаки 👇')
     text = ''
-    for i in get_stickers:
-        text += url + "".join(i) + '\n'
+    if len(get_stickers) == 0:
+        text = 'У вас пока нет стикеров('
+    else:
+        await message.answer('Ваши стикерпаки 👇')
+        for i in get_stickers:
+            text += url + "".join(i) + '\n'
     await message.answer(text, reply_markup=back_to_menu_keyboard)
 
 
-@dp.message_handler(content_types=['photo', 'document'], state=FSMAdmin.photo)
+@dp.message_handler(content_types=['photo', 'document'], state=None)
 async def load_photo(message: types.Message, state: FSMContext):
+    await FSMAdmin.first()
     if message.document:
         text = 'Пожалуйста, поставьте галочку ' \
                '«Сжать изображение» при отправке фото'
@@ -95,10 +91,7 @@ async def choice_background(message: types.Message, state: FSMContext):
             text = 'Нужно немного подождать'
             await message.answer(text)
             background = await photo_remove_bg(data['photo'])
-            data['photo_background'] = True
             data['photo'] = background
-        else:
-            data['photo_background'] = False
     await FSMAdmin.next()
     text = 'Выберите куда загрузить стикер'
     await message.answer(text, reply_markup=pack_keyboard)
@@ -151,6 +144,11 @@ async def stick_create(message: types.Message, state: FSMContext):
                        'https://t.me/addstickers/'
         await message.answer(text + message.text,
                              reply_markup=back_to_menu_keyboard)
+        url_pack = message.text
+        sticker = Stickers(stickers_tg=url_pack,
+                       tg_users=message.from_user.id)
+        session.add(sticker)
+        session.commit()
     else:
         await asyncio.sleep(1)
         await app.send_message("@Stickers", '/publish')
@@ -161,6 +159,13 @@ async def stick_create(message: types.Message, state: FSMContext):
             else message.text
         url_pack = f'{pack_name}_{random_number}'
         await app.send_message("@Stickers", url_pack)
+        get_user = engine.execute(
+            select([Users]).where(Users.user_tg ==
+                                  message.from_user.id)).fetchall()
+        if len(get_user) == 0:
+            user = Users(user_tg=message.from_user.id)
+            session.add(user)
+            session.commit()
         sticker = Stickers(stickers_tg=url_pack,
                            tg_users=message.from_user.id)
         session.add(sticker)
@@ -169,13 +174,6 @@ async def stick_create(message: types.Message, state: FSMContext):
                'https://t.me/addstickers/'
         await message.answer(text + url_pack,
                              reply_markup=back_to_menu_keyboard)
-    get_user = engine.execute(
-                    select([Users]).where(Users.user_tg ==
-                                          message.from_user.id)).fetchall()
-    if len(get_user) == 0:
-        user = Users(user_tg=message.from_user.id)
-        session.add(user)
-        session.commit()
     await state.finish()
 
 
