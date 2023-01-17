@@ -14,7 +14,8 @@ services:
       - "5432:5432"
 
   web:
-    image: truedi1905/tg_bot:v1
+    #image: truedi1905/tg_bot:v1
+    build: .
     restart: always
     depends_on:
       - db
