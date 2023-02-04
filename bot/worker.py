@@ -6,9 +6,9 @@ from pyrogram import Client
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from models import Stickers, engine, Users
+from handlers import Queue
 from keyboard import back_to_menu_keyboard
 from smiles import send_smile
-from handlers import Queue
 
 
 session = Session(bind=engine)
