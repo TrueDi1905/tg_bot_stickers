@@ -14,7 +14,9 @@ async def photo_remove_bg(image):
 
 
 async def photo_resize(image):
-    image = Image.open(image)
+    image_download = io.BytesIO()
+    await image.download(image_download)
+    image = Image.open(image_download)
     fixed_width = 512
     if image.size[0] < image.size[1]:
         width_percent = (fixed_width / float(image.size[1]))

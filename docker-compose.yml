@@ -13,10 +13,10 @@ services:
     ports:
       - "5432:5432"
 
-  web:
-    image: truedi1905/tg_bot:v1
+  #web:
+    #image: truedi1905/tg_bot:v1
     #build: .
-    restart: always
-    depends_on:
-      - db
+   # restart: always
+    #depends_on:
+     # - db
 

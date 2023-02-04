@@ -1,24 +1,17 @@
-import io
-import asyncio
-import random
 import re
 
-import emoji
-from pyrogram import Client
 from aiogram import types, Dispatcher
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from config import dp
+from models import engine, Stickers
 from image_editor import photo_remove_bg, photo_resize
 from keyboard import start_menu_keyboard, \
     back_to_menu_keyboard, photo_choice_keyboard, \
     pack_keyboard, pack_choice, none_pack
-from smiles import send_smile
-from models import engine, Users, Stickers
 
 
 class FSMAdmin(StatesGroup):
@@ -28,9 +21,15 @@ class FSMAdmin(StatesGroup):
     stick_create = State()
 
 
-session = Session(bind=engine)
-app = Client("my_account")
-app.start()
+class StickersCreate:
+    def __init__(self, message, text, photo):
+        self.message = message
+        self.text = text
+        self.photo = photo
+
+
+class Queue:
+    stickers = []
 
 
 async def send_welcome(message: types.Message):
@@ -53,15 +52,16 @@ async def my_stickers(message: types.Message):
     get_stickers = engine.execute(
         select([Stickers.stickers_tg]).where(Stickers.tg_users ==
                                              message.from_user.id)).fetchall()
+    if len(get_stickers) == 0:
+        await message.answer('У вас пока нет стикеров(',
+                             reply_markup=back_to_menu_keyboard)
+        return
     packs = await pack_choice(get_stickers)
     url = 'https://t.me/addstickers/'
     text = ''
-    if len(get_stickers) == 0:
-        text = 'У вас пока нет стикеров('
-    else:
-        await message.answer('Ваши стикерпаки 👇')
-        for i in get_stickers:
-            text += url + "".join(i) + '\n'
+    await message.answer('Ваши стикерпаки 👇')
+    for i in get_stickers:
+        text += url + "".join(i) + '\n'
     await message.answer(text, reply_markup=back_to_menu_keyboard)
 
 
@@ -73,38 +73,31 @@ async def load_photo(message: types.Message, state: FSMContext):
                '«Сжать изображение» при отправке фото'
         await message.answer(text)
         return
-    image_download = io.BytesIO()
-    await message.photo[-1].download(image_download)
-    new_photo = await photo_resize(image_download)
+    new_photo = await photo_resize(message.photo[-1])
     async with state.proxy() as data:
         data['photo'] = new_photo
     await FSMAdmin.next()
-    await FSMAdmin.next()
     text = 'Хотите удалить задний фон на изображении?'
+    await message.answer(text, reply_markup=photo_choice_keyboard)
+
+
+@dp.message_handler(state=FSMAdmin.photo_background)
+async def choice_background(message: types.Message, state: FSMContext):
+    if message.text == 'Удалить фон':
+        await message.answer('Нужно немного подождать')
+        async with state.proxy() as data:
+            data['photo'] = await photo_remove_bg(data['photo'])
+    await FSMAdmin.next()
+    text = 'Выберите куда загрузить стикер'
     await message.answer(text, reply_markup=pack_keyboard)
-                         #reply_markup=photo_choice_keyboard)
-
-
-#@dp.message_handler(state=FSMAdmin.photo_background)
-#async def choice_background(message: types.Message, state: FSMContext):
-#    async with state.proxy() as data:
-#        if message.text == 'Удалить фон':
-#            text = 'Нужно немного подождать'
-#            await message.answer(text)
-#            new_photo = await photo_remove_bg(data['photo'])
-#            async with state.proxy() as data:
-#                data['photo'] = new_photo
-#    await FSMAdmin.next()
-#    text = 'Выберите куда загрузить стикер'
-#    await message.answer(text, reply_markup=pack_keyboard)
 
 
 @dp.message_handler(state=FSMAdmin.pack)
 async def choice_pack(message: types.Message, state: FSMContext):
     if message.text == 'Создать новый пак':
-        text = 'Пожалуйста, введите название для нового набора стикеров'
         async with state.proxy() as data:
             data['pack'] = 'new'
+        text = 'Пожалуйста, введите название для нового набора стикеров'
         await message.answer(text)
         await FSMAdmin.next()
     else:
@@ -112,8 +105,8 @@ async def choice_pack(message: types.Message, state: FSMContext):
             select([Stickers.stickers_tg]).where(
                 Stickers.tg_users == message.from_user.id)).fetchall()
         if len(get_stickers) == 0:
-            await message.answer('У вас пока нет паков',
-                                 reply_markup=none_pack)
+            text = 'У вас пока нет паков'
+            await message.answer(text, reply_markup=none_pack)
             return
         packs = await pack_choice(get_stickers)
         async with state.proxy() as data:
@@ -129,53 +122,14 @@ async def stick_create(message: types.Message, state: FSMContext):
                'и содержать только английские буквы'
         await message.answer(text)
         return
-    await message.answer('Нужно немного подождать')
-    state_pack = None
     async with state.proxy() as data:
         state_pack = data
-    text_create = '/addsticker' if state_pack['pack'] == 'old' else '/newpack'
-    await app.send_message("@Stickers", text_create)
-    await asyncio.sleep(1)
-    await app.send_message("@Stickers", f'{message.text}')
-    await asyncio.sleep(1)
-    await app.send_document("@Stickers", state_pack['photo'])
-    await asyncio.sleep(1)
-    await app.send_message("@Stickers", send_smile())
-    if text_create == '/addsticker':
-        text = 'Стикер скоро будет добавлен в набор: ' \
-                       'https://t.me/addstickers/'
-        await message.answer(text + message.text,
-                             reply_markup=back_to_menu_keyboard)
-        url_pack = message.text
-        sticker = Stickers(stickers_tg=url_pack,
-                       tg_users=message.from_user.id)
-        session.add(sticker)
-        session.commit()
-    else:
-        await asyncio.sleep(1)
-        await app.send_message("@Stickers", '/publish')
-        await asyncio.sleep(1)
-        await app.send_message("@Stickers", '/skip')
-        random_number = random.randint(1, message.from_user.id)
-        pack_name = 'sticker_bot' if ':' in emoji.demojize(message.text) \
-            else message.text
-        url_pack = f'{pack_name}_{random_number}'
-        await app.send_message("@Stickers", url_pack)
-        get_user = engine.execute(
-            select([Users]).where(Users.user_tg ==
-                                  message.from_user.id)).fetchall()
-        if len(get_user) == 0:
-            user = Users(user_tg=message.from_user.id)
-            session.add(user)
-            session.commit()
-        sticker = Stickers(stickers_tg=url_pack,
-                           tg_users=message.from_user.id)
-        session.add(sticker)
-        session.commit()
-        text = 'Ваш набор доступен по ссылке: ' \
-               'https://t.me/addstickers/'
-        await message.answer(text + url_pack,
-                             reply_markup=back_to_menu_keyboard)
+    new_or_old = '/addsticker' if state_pack['pack'] == 'old' else '/newpack'
+
+    photo = state_pack['photo']
+    sicker = StickersCreate(message, new_or_old, photo)
+    Queue.stickers.append(sicker)
+    await message.answer('Нужно немного подождать')
     await state.finish()
 
 
