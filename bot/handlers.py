@@ -22,9 +22,9 @@ class FSMAdmin(StatesGroup):
 
 
 class StickersCreate:
-    def __init__(self, message, text, photo):
+    def __init__(self, message, pack_option, photo):
         self.message = message
-        self.text = text
+        self.pack_option = pack_option
         self.photo = photo
 
 
@@ -124,12 +124,18 @@ async def stick_create(message: types.Message, state: FSMContext):
         return
     async with state.proxy() as data:
         state_pack = data
-    new_or_old = '/addsticker' if state_pack['pack'] == 'old' else '/newpack'
-
+    if state_pack['pack'] == 'old':
+        pack_option = '/addsticker'
+        text = 'Стикер скоро будет добавлен в набор: ' \
+                       'https://t.me/addstickers/'
+        await message.answer(text + message.text,
+                             reply_markup=back_to_menu_keyboard)
+    else:
+        pack_option = '/newpack'
+        await message.answer('Нужно немного подождать')
     photo = state_pack['photo']
-    sicker = StickersCreate(message, new_or_old, photo)
+    sicker = StickersCreate(message, pack_option, photo)
     Queue.stickers.append(sicker)
-    await message.answer('Нужно немного подождать')
     await state.finish()
 
 
