@@ -1,7 +1,6 @@
 from dotenv import dotenv_values
-from sqlalchemy import create_engine, Column, Integer, \
-    ForeignKey, String, BigInteger
-from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, \
+    ForeignKey, String, BigInteger, orm, create_engine
 
 
 ENV = dotenv_values('../.env')
@@ -16,7 +15,7 @@ engine = create_engine(f'postgresql+psycopg2://'
                        f'{DB_USER}:{DB_PASSWORD}'
                        f'@{DB_HOST}:{DB_PORT}/{DB_NAME}')
 
-Base = declarative_base()
+Base = orm.declarative_base()
 
 
 class Stickers(Base):

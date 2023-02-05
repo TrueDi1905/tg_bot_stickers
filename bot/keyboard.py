@@ -41,4 +41,3 @@ async def pack_choice(get_stickers):
         pack_choice_keyboard.add(KeyboardButton(text="".join(pack)))
     pack_choice_keyboard.add(cancel_state_button)
     return pack_choice_keyboard
-

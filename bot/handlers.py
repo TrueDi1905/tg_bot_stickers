@@ -1,6 +1,6 @@
 import re
 
-from aiogram import types, Dispatcher
+from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
@@ -32,6 +32,7 @@ class Queue:
     stickers = []
 
 
+@dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
     text = 'Загрузи сюда фото, что бы создать стикер 👇'
     await message.answer(text, reply_markup=start_menu_keyboard)
@@ -76,9 +77,9 @@ async def load_photo(message: types.Message, state: FSMContext):
     new_photo = await photo_resize(message.photo[-1])
     async with state.proxy() as data:
         data['photo'] = new_photo
-    await FSMAdmin.next()
     text = 'Хотите удалить задний фон на изображении?'
     await message.answer(text, reply_markup=photo_choice_keyboard)
+    await FSMAdmin.next()
 
 
 @dp.message_handler(state=FSMAdmin.photo_background)
@@ -87,9 +88,9 @@ async def choice_background(message: types.Message, state: FSMContext):
         await message.answer('Нужно немного подождать')
         async with state.proxy() as data:
             data['photo'] = await photo_remove_bg(data['photo'])
-    await FSMAdmin.next()
     text = 'Выберите куда загрузить стикер'
     await message.answer(text, reply_markup=pack_keyboard)
+    await FSMAdmin.next()
 
 
 @dp.message_handler(state=FSMAdmin.pack)
@@ -137,7 +138,3 @@ async def stick_create(message: types.Message, state: FSMContext):
     sicker = StickersCreate(message, pack_option, photo)
     Queue.stickers.append(sicker)
     await state.finish()
-
-
-def handler_register_client(dp: Dispatcher):
-    dp.register_message_handler(send_welcome, commands=['start', 'help'])

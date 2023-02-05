@@ -2,11 +2,8 @@ import asyncio
 
 from aiogram.utils import executor
 
-import handlers
-from worker import user_chat_worker
 from config import dp
-
-handlers.handler_register_client(dp)
+from workers import user_chat_worker
 
 
 async def on_startup(dp):

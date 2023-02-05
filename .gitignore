@@ -130,4 +130,4 @@ dmypy.json
 pgdata/
 bot/my_account.session
 inserts.sql
-my_account.session-journal
+bot/my_account.session-journal

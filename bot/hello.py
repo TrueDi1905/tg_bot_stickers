@@ -4,7 +4,7 @@ from dotenv import dotenv_values
 from pyrogram import Client
 
 
-ENV = dotenv_values('../../.env')
+ENV = dotenv_values('../.env')
 api_id = ENV['API_ID']
 api_hash = ENV['API_HASH']
 
