@@ -4,8 +4,8 @@ import logging
 from aiogram.utils import exceptions, executor
 from sqlalchemy import select
 
-from models import engine, Users
-from config import bot, dp
+from bot.models import engine, Users
+from bot.config import bot, dp
 
 log = logging.getLogger('broadcast')
 

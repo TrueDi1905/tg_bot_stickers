@@ -1,8 +1,12 @@
 import asyncio
+
+from dotenv import dotenv_values
 from pyrogram import Client
 
-api_id = 25545663
-api_hash = "e16409f43cf6ea76437d10c1e7352596"
+
+ENV = dotenv_values('../../.env')
+api_id = ENV['API_ID']
+api_hash = ENV['API_HASH']
 
 
 async def main():
