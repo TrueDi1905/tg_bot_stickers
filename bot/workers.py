@@ -1,10 +1,9 @@
 import asyncio
-import random
-import emoji
+
 
 from pyrogram import Client
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select, update, values
 from models import Stickers, engine, Users
 from handlers import Queue
 from keyboard import back_to_menu_keyboard
@@ -23,38 +22,43 @@ async def user_chat_worker():
                 message = item.message
                 pack_option = item.pack_option
                 photo = item.photo
-                await app.send_message("@Stickers", pack_option)
-                await asyncio.sleep(1)
-                await app.send_message("@Stickers", f'{message.text}')
-                await asyncio.sleep(1)
-                await app.send_document("@Stickers", photo)
-                await asyncio.sleep(1)
-                await app.send_message("@Stickers", send_smile())
                 if pack_option == '/addsticker':
-                    url_pack = message.text
-                    sticker = Stickers(stickers_tg=url_pack,
-                                       tg_users=message.from_user.id)
-                    session.add(sticker)
-                    session.commit()
-                else:
-                    await asyncio.sleep(1)
-                    await app.send_message("@Stickers", '/publish')
-                    await asyncio.sleep(1)
-                    await app.send_message("@Stickers", '/skip')
-                    random_number = random.randint(1, message.from_user.id)
-                    pack_name = 'sticker_bot' if ':' in emoji.demojize(message.text) \
-                        else message.text
-                    url_pack = f'{pack_name}_{random_number}'
-                    await app.send_message("@Stickers", url_pack)
-                    get_user = engine.execute(
-                        select([Users]).where(Users.user_tg ==
-                                              message.from_user.id)).fetchall()
-                    if len(get_user) == 0:
+                    await app.send_message("@Stickers", pack_option)
+                    await app.send_message("@Stickers", f'{message.text}')
+                    await app.send_document("@Stickers", photo)
+                    smile_id = engine.execute(
+                        select([Stickers.smile_id]).where(Stickers.stickers_tg == message.text)).fetchone()[0]
+                    if smile_id == 120:
+                        await message.answer('В этот пак больше стикеров добавить нельзя(, создай новый',
+                                             reply_markup=back_to_menu_keyboard)
+
+                        return
+                    await app.send_message("@Stickers", send_smile(smile_id))
+                    engine.execute(update(Stickers.smile_id).where(
+                        Stickers.smile_id == smile_id).values(
+                        stickers_tg=smile_id + 1)).fetchall()
+                if pack_option == '/newpack':
+                    await app.send_message("@Stickers", pack_option)
+                    await app.send_message("@Stickers", f'{message.text} @Stickers_Now_Bot')
+                    get_user = len(engine.execute(
+                        select(Users).where(Users.user_tg == message.from_user.id)).fetchall())
+                    if get_user == 0:
                         user = Users(user_tg=message.from_user.id)
                         session.add(user)
                         session.commit()
+                    smile_id = 0
+                    await app.send_document("@Stickers", photo)
+                    await app.send_message("@Stickers", send_smile(smile_id))
+                    await asyncio.sleep(1)
+                    await app.send_message("@Stickers", '/publish')
+                    await app.send_message("@Stickers", '/skip')
+                    get_stickers = len(engine.execute(
+                        select(Stickers.id)).fetchall())
+                    url_pack = f'Stickers_Now_Bot_pack_{get_stickers + 1}'
+                    await app.send_message("@Stickers", url_pack)
                     sticker = Stickers(stickers_tg=url_pack,
-                                       tg_users=message.from_user.id)
+                                       tg_users=message.from_user.id,
+                                       smile_id=smile_id)
                     session.add(sticker)
                     session.commit()
                     text = 'Ваш набор доступен по ссылке: ' \

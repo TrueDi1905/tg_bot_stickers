@@ -118,11 +118,6 @@ async def choice_pack(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=FSMAdmin.stick_create)
 async def stick_create(message: types.Message, state: FSMContext):
-    if len(message.text) < 5 or re.search(r'[а-яА-Я]', message.text):
-        text = 'Название должно быть минимум 5 букв ' \
-               'и содержать только английские буквы'
-        await message.answer(text)
-        return
     async with state.proxy() as data:
         state_pack = data
     if state_pack['pack'] == 'old':

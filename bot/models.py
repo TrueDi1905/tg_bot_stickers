@@ -24,6 +24,7 @@ class Stickers(Base):
     id = Column(Integer, primary_key=True)
     stickers_tg = Column(String)
     tg_users = Column(BigInteger, ForeignKey('Users.user_tg'))
+    smile_id = Column(Integer)
 
 
 class Users(Base):

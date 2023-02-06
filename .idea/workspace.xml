@@ -5,15 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="60a9daa6-0716-41b7-b66d-d5b963205900" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/tg_bot_stickers.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/tg_bot_stickers.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/handlers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot/hello.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/hello.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/keyboard.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/keyboard.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot/smiles.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/smiles.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot/worker.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/workers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot/workers.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot/workers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,5 +81,16 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
