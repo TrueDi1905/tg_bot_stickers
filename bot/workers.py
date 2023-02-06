@@ -26,7 +26,7 @@ async def user_chat_worker():
                     await app.send_message("@Stickers", pack_option)
                     await app.send_message("@Stickers", f'{message.text}')
                     await app.send_document("@Stickers", photo)
-                    smile_id = engine.execute(
+                    smile_id = session.execute(
                         select([Stickers.smile_id]).where(Stickers.stickers_tg == message.text)).fetchone()[0]
                     if smile_id == 120:
                         await message.answer('В этот пак больше стикеров добавить нельзя(, создай новый',
@@ -34,9 +34,10 @@ async def user_chat_worker():
 
                         return
                     await app.send_message("@Stickers", send_smile(smile_id))
-                    engine.execute(update(Stickers.smile_id).where(
-                        Stickers.smile_id == smile_id).values(
-                        stickers_tg=smile_id + 1)).fetchall()
+                    session.execute(update(Stickers).where(
+                        Stickers.stickers_tg == message.text).values(
+                        smile_id=smile_id + 1))
+                    session.commit()
                 if pack_option == '/newpack':
                     await app.send_message("@Stickers", pack_option)
                     await app.send_message("@Stickers", f'{message.text} @Stickers_Now_Bot')
