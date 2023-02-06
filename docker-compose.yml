@@ -12,9 +12,9 @@ services:
       - .:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-  web:
-    image: truedi1905/sticker_bot:v1.1
+  #web:
+    #image: truedi1905/sticker_bot:v1.1
     #build: .
-    restart: always
-    depends_on:
-      - db
+    #restart: always
+    #depends_on:
+      #- db

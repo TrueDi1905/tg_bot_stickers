@@ -4,7 +4,7 @@ from PIL import Image
 from rembg import remove
 
 
-async def photo_remove_bg(image):
+def photo_remove_bg(image):
     input = Image.open(image)
     output = remove(input)
     new_image = io.BytesIO()

@@ -87,7 +87,7 @@ async def choice_background(message: types.Message, state: FSMContext):
     if message.text == 'Удалить фон':
         await message.answer('Нужно немного подождать')
         async with state.proxy() as data:
-            data['photo'] = await photo_remove_bg(data['photo'])
+            data['photo'] = photo_remove_bg(data['photo'])
     text = 'Выберите куда загрузить стикер'
     await message.answer(text, reply_markup=pack_keyboard)
     await FSMAdmin.next()
