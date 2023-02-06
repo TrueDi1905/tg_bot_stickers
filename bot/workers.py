@@ -38,6 +38,7 @@ async def user_chat_worker():
                         Stickers.stickers_tg == message.text).values(
                         smile_id=smile_id + 1))
                     session.commit()
+                    
                 if pack_option == '/newpack':
                     await app.send_message("@Stickers", pack_option)
                     await app.send_message("@Stickers", f'{message.text} @Stickers_Now_Bot')
