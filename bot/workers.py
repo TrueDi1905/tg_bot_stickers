@@ -1,9 +1,9 @@
 import asyncio
 
-
 from pyrogram import Client
 from sqlalchemy.orm import Session
-from sqlalchemy import select, update, values
+from sqlalchemy import select, update
+
 from models import Stickers, engine, Users
 from handlers import Queue
 from keyboard import back_to_menu_keyboard
@@ -27,23 +27,24 @@ async def user_chat_worker():
                     await app.send_message("@Stickers", f'{message.text}')
                     await app.send_document("@Stickers", photo)
                     smile_id = session.execute(
-                        select([Stickers.smile_id]).where(Stickers.stickers_tg == message.text)).fetchone()[0]
+                        select([Stickers.smile_id]).where(
+                            Stickers.stickers_tg == message.text)).fetchone()[0]
                     if smile_id == 120:
-                        await message.answer('В этот пак больше стикеров добавить нельзя(, создай новый',
+                        await message.answer(
+                            'В этот пак больше стикеров добавить нельзя(, создай новый',
                                              reply_markup=back_to_menu_keyboard)
-
                         return
                     await app.send_message("@Stickers", send_smile(smile_id))
                     session.execute(update(Stickers).where(
                         Stickers.stickers_tg == message.text).values(
                         smile_id=smile_id + 1))
                     session.commit()
-                    
                 if pack_option == '/newpack':
                     await app.send_message("@Stickers", pack_option)
                     await app.send_message("@Stickers", f'{message.text} @Stickers_Now_Bot')
                     get_user = len(engine.execute(
-                        select(Users).where(Users.user_tg == message.from_user.id)).fetchall())
+                        select(Users).where(
+                            Users.user_tg == message.from_user.id)).fetchall())
                     if get_user == 0:
                         user = Users(user_tg=message.from_user.id)
                         session.add(user)
