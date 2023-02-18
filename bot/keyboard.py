@@ -13,14 +13,6 @@ back_to_menu_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 back_to_menu_keyboard.add(cancel_state_button)
 
 
-#Развилка на удаление фона
-continue_button = KeyboardButton(text='Не удалять фон')
-delete_bg_button = KeyboardButton(text='Удалить фон')
-photo_choice_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-photo_choice_keyboard.add(continue_button, delete_bg_button)
-photo_choice_keyboard.add(cancel_state_button)
-
-
 #Развилка выбора пака
 new_pack_button = KeyboardButton(text='Создать новый пак')
 choice_pack = KeyboardButton(text='Выбрать действующий пак')

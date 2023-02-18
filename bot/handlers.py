@@ -1,5 +1,3 @@
-import re
-
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
@@ -8,17 +6,15 @@ from sqlalchemy import select
 
 from config import dp
 from models import engine, Stickers
-from image_editor import photo_remove_bg, photo_resize
+from image_editor import photo_resize
 from keyboard import start_menu_keyboard, \
-    back_to_menu_keyboard, photo_choice_keyboard, \
-    pack_keyboard, pack_choice, none_pack
+    back_to_menu_keyboard, pack_keyboard, pack_choice, none_pack
 
 
 class FSMAdmin(StatesGroup):
     photo = State()
-    photo_background = State()
     pack = State()
-    stick_create = State()
+    stickers_pack = State()
 
 
 class StickersCreate:
@@ -57,7 +53,6 @@ async def my_stickers(message: types.Message):
         await message.answer('У вас пока нет стикеров(',
                              reply_markup=back_to_menu_keyboard)
         return
-    packs = await pack_choice(get_stickers)
     url = 'https://t.me/addstickers/'
     text = ''
     await message.answer('Ваши стикерпаки 👇')
@@ -77,17 +72,6 @@ async def load_photo(message: types.Message, state: FSMContext):
     new_photo = await photo_resize(message.photo[-1])
     async with state.proxy() as data:
         data['photo'] = new_photo
-    text = 'Хотите удалить задний фон на изображении?'
-    await message.answer(text, reply_markup=photo_choice_keyboard)
-    await FSMAdmin.next()
-
-
-@dp.message_handler(state=FSMAdmin.photo_background)
-async def choice_background(message: types.Message, state: FSMContext):
-    if message.text == 'Удалить фон':
-        await message.answer('Нужно немного подождать')
-        async with state.proxy() as data:
-            data['photo'] = photo_remove_bg(data['photo'])
     text = 'Выберите куда загрузить стикер'
     await message.answer(text, reply_markup=pack_keyboard)
     await FSMAdmin.next()
@@ -109,18 +93,25 @@ async def choice_pack(message: types.Message, state: FSMContext):
             text = 'У вас пока нет паков'
             await message.answer(text, reply_markup=none_pack)
             return
-        packs = await pack_choice(get_stickers)
+        packs_button = await pack_choice(get_stickers)
+        packs = []
+        for pack in get_stickers:
+            packs.append("".join(pack))
         async with state.proxy() as data:
             data['pack'] = 'old'
-        await message.answer('Выберите пак', reply_markup=packs)
+            data['stickers_pack'] = packs
+        await message.answer('Выберите пак', reply_markup=packs_button)
         await FSMAdmin.next()
 
 
-@dp.message_handler(state=FSMAdmin.stick_create)
+@dp.message_handler(state=FSMAdmin.stickers_pack)
 async def stick_create(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         state_pack = data
     if state_pack['pack'] == 'old':
+        if message.text not in data['stickers_pack']:
+            await message.answer('Выбери нормальный пак')
+            return
         pack_option = '/addsticker'
         text = 'Стикер скоро будет добавлен в набор: ' \
                        'https://t.me/addstickers/'
